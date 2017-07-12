@@ -1,0 +1,67 @@
+<!doctype html>
+<html ng-app="myApp">
+<head>
+	<neta charset="utf-8" />
+	<title>
+		Explore ES6 into AngularJS Demos
+	</title>
+</head>
+<body ng-controller="myController">
+
+	<h1>
+		Controller
+	</h1>
+
+	<div>
+	<table>
+	  <tr><th>Name</th><th>Phone</th></tr>
+	  <tr ng-repeat="friend in friends">
+	    <td ng-click="onNameClick(friend)">{{friend.name}}</td>
+	    <td>{{friend.phone}}</td>
+	  </tr>
+	</table>
+	</div>
+	<div><input type="button" value="Add Firend" ng-click="onAddClick('Cara', '123456789')"></div>
+
+<script src="angular.js"></script>
+<script src="base1.js"></script>
+<script>
+var myApp = angular.module('myApp', []);
+myApp.service('myService', myService);
+// myApp.controller('myController', ($scope, myService) => new MyController($scope, myService));
+
+function myService(){
+	return {
+		queryData: [{name:'John', phone:'555-1276'},
+                         {name:'Mary', phone:'800-BIG-MARY'},
+                         {name:'Mike', phone:'555-4321'},
+                         {name:'Adam', phone:'555-5678'},
+                         {name:'Julie', phone:'555-8765'},
+                         {name:'Juliette', phone:'555-5678'}]
+	}
+}
+
+// function myController($scope, myService){
+// 	$scope.friends = myService.queryData;
+// }
+
+class MyBaseController extends BaseNgClass {
+	constructor($scope, myService) {
+		super(...arguments);
+		$scope.friends = myService.queryData;
+
+		$scope.onAddClick = this.addFriend.bind(this);
+
+	}
+
+	addFriend(name, phone) {
+		this.$scope.friends.push({name: name, phone: phone}); 
+	}
+
+}
+MyBaseController.$inject = ['$scope', 'myService'];
+
+myApp.controller('myController', MyBaseController.create());
+</script>
+</body>
+</html>

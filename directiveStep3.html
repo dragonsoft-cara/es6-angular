@@ -1,0 +1,89 @@
+<!doctype html>
+<html ng-app="docsTimeDirective">
+<head>
+	<neta charset="utf-8" />
+	<title>
+		Explore ES6 into AngularJS Demos
+	</title>
+</head>
+<body>
+
+	<h1>
+		Directive
+	</h1>
+
+	<div ng-controller="Controller">
+		Date format: <input ng-model="format"> <hr/>
+		Current time is: <span my-current-time format="format"></span>
+
+	</div>
+
+<script type="text/javascript" src="jquery-2.0.2.min.js"></script>
+<script src="angular.js"></script>
+<script src="base.js"></script>
+<script>
+
+angular.module('docsTimeDirective', [])
+
+.controller('Controller', ['$scope', function($scope) {
+  $scope.format = 'M/d/yy h:mm:ss a';
+}])
+
+
+// step 3:
+class MyCurrentTimeController extends BaseNgClass {
+
+	set format(newFormat) {
+		this.updateTime();
+		this._format = newFormat;
+	}
+
+	get format(){
+		return this._format;
+	}
+
+	updateTime() {
+		this.currentTime = this.dateFilter(new Date(), this.format);
+	}
+}
+
+MyCurrentTimeController.$inject = ['dateFilter'];
+// angular.module('docsTimeDirective').controller('myCurrentTimeController', MyCurrentTimeController.create());
+
+class MyCurrentTimeDirective extends BaseDirectiveClass {
+	constructor(...injects) {
+		super(...injects);
+
+		this.scope = {
+			format: '='
+		}
+		this.template = "{{ctrl.currentTime}}";
+		// this.controller = "myCurrentTimeController";
+		this.controller = MyCurrentTimeController.create();
+		this.controllerAs = "ctrl";
+
+		// step 3:
+		this.bindToController = true;
+	}
+
+	// step 3:
+	link (scope, element, attr, ctrl){
+		let _injects = this;
+
+	    // start the UI update process; save the timeoutId for canceling
+	    let timeoutId = _injects.$interval(function() {
+	      ctrl.updateTime(); // update DOM
+	    }, 1000);
+
+	    scope.$on('$destroy', function() {
+	      _injects.$interval.cancel(timeoutId);
+	    });		
+	}
+}
+
+MyCurrentTimeDirective.$inject = ['$interval', 'dateFilter'];
+
+angular.module('docsTimeDirective').directive('myCurrentTime', MyCurrentTimeDirective.create());
+</script>
+</body>
+</html>

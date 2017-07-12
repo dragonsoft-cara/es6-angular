@@ -1,0 +1,93 @@
+<!doctype html>
+<html ng-app="myApp">
+<head>
+	<neta charset="utf-8" />
+	<title>
+		Explore ES6 into AngularJS Demos
+	</title>
+</head>
+<body>
+
+	<h1>
+		Compile vs Link
+	</h1>
+
+	<div>
+	See documentation: <a target="_blank" href="https://docs.angularjs.org/api/ng/service/$compile">https://docs.angularjs.org/api/ng/service/$compile</a>
+	</div>
+
+	<use-compile-pre></use-compile-pre>
+
+	<!-- <use-compile-post-link></use-compile-post-link> -->
+
+	<use-link-pre></use-link-pre>
+
+<script src="angular.js"></script>
+<script>
+var myApp = angular.module('myApp', []);
+
+myApp.directive("useCompilePre", function(){
+	var compileFn = function compile(tElement, tAttrs, transclude) {
+      return {
+         /*pre: function preLink(scope, iElement, iAttrs, controller) { 
+				console.log( "compile pre!" );
+         },*/
+         post: function postLink(scope, iElement, iAttrs, controller) {
+         		console.log( "post, like a boss!" );
+         }
+      }
+      // or
+      // return function postLink( ... ) { ... }
+
+    }
+
+	  return {
+	  	restrict: "EA",
+	  	compile: compileFn,
+	  	templateUrl: "template1.html"
+	  }
+});
+
+myApp.directive("useCompilePostLink", function(){
+	var compileFn = function postLink(tElement, tAttrs, transclude) {
+      console.log("post link");
+    }
+
+	  return {
+	  	restrict: "EA",
+	  	compile: compileFn,
+	  	templateUrl: "template1.html"
+	  }
+});
+
+myApp.directive("useLinkPre", function(){
+	var compileFn = function postLink(tElement, tAttrs, transclude) {
+		debugger;
+      console.log("post link");
+    }
+
+    // var link = function(){
+    // 	console.log("link");
+    // }
+
+    /*var link = {
+    	pre: function preLink(scope, iElement, iAttrs, controller) {
+    		console.log("link pre");
+    	}
+    }*/
+    var link = {
+    	post: function postLink(scope, iElement, iAttrs, controller) {
+         		console.log( "link post." );
+         }
+    }
+
+	  return {
+	  	restrict: "EA",
+	  	// compile: compileFn,
+	  	link: link,
+	  	templateUrl: "template1.html"
+	  }
+});
+</script>
+</body>
+</html>

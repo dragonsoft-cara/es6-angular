@@ -1,0 +1,69 @@
+<!doctype html>
+<html ng-app="docsTimeDirective">
+<head>
+	<neta charset="utf-8" />
+	<title>
+		Explore ES6 into AngularJS Demos
+	</title>
+</head>
+<body>
+
+	<h1>
+		Directive
+	</h1>
+
+	<div ng-controller="Controller">
+		Date format: <input ng-model="format"> <hr/>
+		Current time is: <span my-current-time format="format"></span>
+	</div>
+
+<script src="angular.js"></script>
+<script>
+
+angular.module('docsTimeDirective', [])
+
+.controller('Controller', ['$scope', function($scope) {
+  $scope.format = 'M/d/yy h:mm:ss a';
+}])
+
+
+function myCurrentTimeDirective($interval, dateFilter) {
+
+  return {
+    restrict: "EA",
+    link: link,
+    template: "{{currentTime}}",
+    scope: {
+      format: '='
+    }
+  };
+
+  function link(scope, element, attrs) {
+    var timeoutId;
+
+    function updateTime() {
+      scope.currentTime = dateFilter(new Date(), scope.format);
+    }
+
+    scope.$watch('format', function(value) {
+      updateTime();
+    });
+
+    element.on('$destroy', function() {
+      $interval.cancel(timeoutId);
+    });
+
+    // start the UI update process; save the timeoutId for canceling
+    timeoutId = $interval(function() {
+      updateTime(); // update DOM
+    }, 1000);
+  }
+}
+
+myCurrentTimeDirective.$inject = ['$interval', 'dateFilter'];
+
+angular.module('docsTimeDirective').directive('myCurrentTime', myCurrentTimeDirective);
+
+</script>
+</body>
+</html>

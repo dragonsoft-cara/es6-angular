@@ -1,0 +1,76 @@
+<!doctype html>
+<html ng-app="docsTimeDirective">
+<head>
+	<neta charset="utf-8" />
+	<title>
+		Explore ES6 into AngularJS Demos
+	</title>
+</head>
+<body>
+
+	<h1>
+		Directive
+	</h1>
+
+	<div ng-controller="Controller">
+		Date format: <input ng-model="format"> <hr/>
+		Current time is: <span my-current-time format="format"></span>
+
+	</div>
+
+<script type="text/javascript" src="jquery-2.0.2.min.js"></script>
+<script src="angular.js"></script>
+<script src="base2.js"></script>
+<script>
+
+angular.module('docsTimeDirective', [])
+
+.controller('Controller', ['$scope', function($scope) {
+  $scope.format = 'M/d/yy h:mm:ss a';
+}])
+
+//step 1:
+class MyCurrentTimeDirective extends BaseNgClass {
+	constructor(...injects) {
+		super(...injects);
+
+		this.scope = {
+			format: '='
+		}
+		this.restrict = "EA";
+		this.template = "{{currentTime}}";
+		this.link = this._link.bind(this);
+	}
+
+	_link (scope, element, attrs){
+		// debugger;
+		let _injects = this;
+
+	    let timeoutId;
+
+	    scope.$watch('format', function(value) {
+	      updateTime();
+	    });
+
+	    scope.$on('$destroy', function() {
+	      _injects.$interval.cancel(timeoutId);
+	    });
+
+	    // start the UI update process; save the timeoutId for canceling
+	    timeoutId = _injects.$interval(function() {
+	      updateTime(); // update DOM
+	    }, 1000);
+
+
+	    function updateTime() {
+	      scope.currentTime = _injects.dateFilter(new Date(), scope.format);
+	    }
+	}
+}
+MyCurrentTimeDirective.inject(['$interval', 'dateFilter']);
+
+angular.module('docsTimeDirective').directive('myCurrentTime', MyCurrentTimeDirective.create());
+
+</script>
+</body>
+</html>
