@@ -6,8 +6,11 @@ class BaseNgClass {
 		}
 	}
 
-	static create() {
-		let createFunction = (...injects) => (new this(...injects));
+	static create(...opts) {
+		let createFunction = (...injects) => {
+			let args = [injects].concat(opts);
+			return new this(...args);
+		}
 		createFunction.$inject = this.ngInject;
 		return createFunction;
 	}
