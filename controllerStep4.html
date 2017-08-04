@@ -21,7 +21,7 @@
 	  </tr>
 	</table>
 	</div>
-	<div><input type="button" value="Add Firend" ng-click="ctrl.onAddClick('Cara', '123456789')"></div>
+	<div><input type="button" value="Add Firend" ng-click="ctrl.addFriend('Cara', '123456789')"></div>
 
 <script src="angular.js"></script>
 <script src="base2.js"></script>
@@ -46,7 +46,7 @@ class MyBaseController extends BaseNgClass {
 		super(...arguments);
 		this.friends = this.myService.queryData;
 
-		this.onAddClick = this.addFriend;
+		// this.onAddClick = this.addFriend;
 
 	}
 

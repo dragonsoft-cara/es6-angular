@@ -16,25 +16,25 @@
 	See documentation: <a target="_blank" href="https://docs.angularjs.org/api/ng/service/$compile">https://docs.angularjs.org/api/ng/service/$compile</a>
 	</div>
 
-	<use-compile-pre></use-compile-pre>
+	<!-- <use-compile-pre-post></use-compile-pre-post> -->
 
-	<!-- <use-compile-post-link></use-compile-post-link> -->
+	<use-compile-post-link></use-compile-post-link>
 
-	<use-link-pre></use-link-pre>
+	<use-link></use-link>
 
 <script src="angular.js"></script>
 <script>
 var myApp = angular.module('myApp', []);
 
-myApp.directive("useCompilePre", function(){
+myApp.directive("useCompilePrePost", function(){
 	var compileFn = function compile(tElement, tAttrs, transclude) {
       return {
-         /*pre: function preLink(scope, iElement, iAttrs, controller) { 
+         pre: function preLink(scope, iElement, iAttrs, controller) { 
 				console.log( "compile pre!" );
-         },*/
-         post: function postLink(scope, iElement, iAttrs, controller) {
-         		console.log( "post, like a boss!" );
-         }
+         }//,
+         // post: function postLink(scope, iElement, iAttrs, controller) {
+         // 		console.log( "compile post!" );
+         // }
       }
       // or
       // return function postLink( ... ) { ... }
@@ -49,8 +49,10 @@ myApp.directive("useCompilePre", function(){
 });
 
 myApp.directive("useCompilePostLink", function(){
-	var compileFn = function postLink(tElement, tAttrs, transclude) {
-      console.log("post link");
+	var compileFn = function compile (tElement, tAttrs, transclude) {
+      return function postLink(scope, iElement, iAttrs, controller) {
+      	console.log("compile postLink");
+      }
     }
 
 	  return {
@@ -60,26 +62,25 @@ myApp.directive("useCompilePostLink", function(){
 	  }
 });
 
-myApp.directive("useLinkPre", function(){
-	var compileFn = function postLink(tElement, tAttrs, transclude) {
-		debugger;
-      console.log("post link");
-    }
+myApp.directive("useLink", function(){
 
-    // var link = function(){
-    // 	console.log("link");
-    // }
+    var link = function(scope, iElement, iAttrs, controller){
+    	console.log("link");
+    }
 
     /*var link = {
     	pre: function preLink(scope, iElement, iAttrs, controller) {
     		console.log("link pre");
     	}
     }*/
-    var link = {
-    	post: function postLink(scope, iElement, iAttrs, controller) {
-         		console.log( "link post." );
-         }
-    }
+    // var link = {
+    // 	post: function postLink(scope, iElement, iAttrs, controller) {
+    //      		console.log( "link post." );
+    //      },
+    //      // pre: function preLink(){
+    //      // 		console.log("link pre");
+    //      // }
+    // }
 
 	  return {
 	  	restrict: "EA",

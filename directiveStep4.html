@@ -50,7 +50,7 @@ class MyCurrentTimeController extends BaseNgClass {
 	}
 }
 
-MyCurrentTimeController.$inject = ['dateFilter'];
+MyCurrentTimeController.inject(['dateFilter']);
 // angular.module('docsTimeDirective').controller('myCurrentTimeController', MyCurrentTimeController.create());
 
 class MyCurrentTimeDirective extends BaseDirectiveClass {
@@ -84,9 +84,11 @@ class MyCurrentTimeDirective extends BaseDirectiveClass {
 	}
 }
 
-MyCurrentTimeDirective.$inject = ['$interval', 'dateFilter'];
+MyCurrentTimeDirective.inject(['$interval', 'dateFilter']);
 
 angular.module('docsTimeDirective').directive('myCurrentTime', MyCurrentTimeDirective.create());
+
+MyCurrentTimeDirective.inject('$filter');
 
 class MyCurrentTimeWithZoneDirective extends MyCurrentTimeDirective {
 	constructor() {

@@ -56,7 +56,7 @@ class MyCurrentTimeDirective extends BaseNgClass {
 		this.scope = {
 			format: '='
 		}
-		this.template = "{{ctrl.currentTime}}";
+		this.template = "<div>{{ctrl.currentTime}}</div>";
 		// this.controller = "myCurrentTimeController";
 		this.controller = MyCurrentTimeController.create();
 		this.controllerAs = "ctrl";

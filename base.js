@@ -1,26 +1,40 @@
 
 class BaseNgClass {
 	constructor(...injects) {
-		if(this.constructor.$inject && this.constructor.$inject.length)
-			this.constructor.$inject.forEach((injectName, i) => this[injectName] = injects[i]);
+		if(injects && injects.length) {
+			injects.forEach((inject, i) => this[this.constructor.ngInject[i]] = inject);
+		}
 	}
 
-	static create(){
-		let createFunction = (...injects) => new this(...injects);
-		createFunction.$inject = this.$inject;
+	static create() {
+		let createFunction = (...injects) => (new this(...injects));
+		createFunction.$inject = this.ngInject;
 		return createFunction;
 	}
 
-	static inject(injects){
-		if(!this.$inject) {
-			this.$inject = injects;
+	// make injection inherited from parent
+	static inject(injects) {
+		if(!this.ngInject) {
+			this.ngInject = injects;
 		} else {
-			this.$inject = [...new Set(this.$inject.concat(injects))];
+			this.ngInject = [...new Set(this.ngInject.concat(injects))];
 		}
-	}
+	};
 }
 
 class BaseDirectiveClass extends BaseNgClass {
+
+	// Inherit scope properties from parent
+	setScope(newScope) {
+
+		if(!this.scope) {
+			this.scope = newScope;
+		} else {
+			$.extend( this.scope, newScope );
+		}
+
+	}
+
 	compile() {
 
 		// make "this" point to directive class in link/pre functions
@@ -39,26 +53,18 @@ class BaseDirectiveClass extends BaseNgClass {
 					this.scope = args[0];
 					pre.apply(this, args);
 				}
-			} 
+			}
 			if(this.link.post && typeof this.link.post == "function") {
 				let post = this.link.post;
 				this.link.post = (...args) => {
 					this.scope = args[0];
 					post.apply(this, args);
-				}				
+				}
 			}
 		} else {
-			console.log("error in directive link.");
+			console.log("no link function or error in ["+ this.constructor.name +"] directive link.");
 		}
 
 		return this.link;
-	}	
-
-	setScope(newScope) {
-		if(!this.scope) {
-			this.scope = newScope;
-		} else {
-			$.extend( this.scope, newScope );
-		}
-	}	
+	}
 }

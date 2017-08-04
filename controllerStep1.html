@@ -46,15 +46,17 @@ function myService(){
 // }
 
 class MyController {
-	constructor($scope, myService) {
-		this.$scope = $scope;
-
-		$scope.friends = myService.queryData;
-		$scope.onAddClick = this.onAddClick.bind(this);
+	constructor(a, myService) {
+		this.ngScope = a;
+debugger;
+		this.ngScope.friends = myService.queryData;
+		this.ngScope.onAddClick = this.onAddClick;//.bind(this);
 	}
 
 	onAddClick (name, phone){
-		this.$scope.friends.push({name: name, phone: phone});
+		debugger;
+		let _self = this;
+		_self.ngScope.friends.push({name: name, phone: phone});
 	}
 }
 MyController.$inject = ['$scope', 'myService'];
