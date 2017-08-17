@@ -1,0 +1,230 @@
+<!doctype html>
+<html ng-app="docsTimeDirective">
+<head>
+	<neta charset="utf-8" />
+	<title>
+		Explore ES6 into AngularJS Demos
+	</title>
+</head>
+<body>
+
+	<h1>
+		Directive
+	</h1>
+
+	<div ng-controller="Controller">
+		<query-tree init-data='1'></query-tree>
+		<query-tree></query-tree>
+	</div>
+
+<script type="text/javascript" src="jquery-2.0.2.min.js"></script>
+<script src="angular.js"></script>
+<script src="base.js"></script>
+<script>
+
+angular.module('docsTimeDirective', [])
+
+.controller('Controller', ['$scope', function($scope) {
+  $scope.format = 'M/d/yy h:mm:ss a';
+  $scope.zone = "Shanghai";
+}])
+
+var count = 0;
+var queryTree = class extends BaseNgClass {
+	constructor (...injects){
+		super(...injects);
+		this.restrict = 'E';
+		this.template= '<div><button ng-click="btnClick()">Test</button></div>';
+		this.replace= true;
+		this.scope = {
+			initData: '@'
+		};
+
+		this.testData = count;
+		console.log(["consturctor", this.testData]);
+		count++;
+		this.link = this._link.bind(this);
+		
+	}
+	_link (scope,element){
+		var self = this;
+		this.initData = scope.initData || 'Default';
+		// this.testData = count;
+		// console.log(["link function", this.testData]);
+		// count++;
+		//element.get(0).prepend(this.initData);
+		//$(element.get(0),'button').on('click',function(){self.__onBtnClick();})
+		scope.btnClick = this._btnClick.bind(this);
+	}
+
+	_btnClick(){
+		console.log(this.testData);
+	}
+
+	__onBtnClick(){
+		// console.log(this.initData);
+		console.log(this.testData);
+	}
+}
+
+var _queryTreeObj = {
+	restrict: "E",
+	template: '<div><button ng-click="btnClick()">Test</button></div>',
+	replace: true,
+	scope: {
+			initData: '@'
+		},
+	link: function(scope,element){
+		var self = this;
+		console.log(this === _queryTreeObj);
+		this.initData = scope.initData || 'Default';
+		// this.testData = count;
+		// console.log(["link function", this.testData]);
+		// count++;
+		//element.get(0).prepend(this.initData);
+		//$(element.get(0),'button').on('click',function(){self.__onBtnClick();})
+		scope.btnClick = function(){
+			console.log(self.initData);
+		};
+	}	
+
+}
+class TestDirective extends BaseNgClass{
+	constructor(injects, color) {
+		super(...injects);
+		console.log(color);
+		//let directive = this.directive = {};
+		this.restrict = 'E';
+		this.template= '<div><button ng-click="btnClick()">Test</button></div>';
+		this.replace= true;
+		this.scope = {
+			initData: '@'
+		};
+
+		this.testData = count;
+		count ++; 
+	}
+
+	// replace(){
+	// 	console.log(["replace", this.testData]);
+	// }
+
+	compile(scope, element){
+		console.log(["compile", this.testData]);
+      return this._postLink;	
+	}
+
+	_preLink(scope, iElement, iAttrs, controller){
+		console.log(["prelink", this.testData]);
+		this.initData = scope.initData || 'Default';
+		scope.btnClick = this.__onBtnClick.bind(this);
+	}
+
+	_postLink(scope, iElement, iAttrs, controller){
+		console.log(["postLink", this.testData]);
+		this.initData = scope.initData || 'hehe';
+		scope.btnClick = this.__onBtnClick.bind(this);
+	}
+
+	// link(scope, element){
+	// 	console.log(["link function..", this.testData]);
+
+	// 	var self = this;
+	// 	this.initData = scope.initData || 'Default';
+	// 	// this.testData = count;
+	// 	// console.log(["link function", this.testData]);
+	// 	// count++;
+	// 	//element.get(0).prepend(this.initData);
+	// 	//$(element.get(0),'button').on('click',function(){self.__onBtnClick();})
+	// 	scope.btnClick = this.__onBtnClick.bind(this);
+	// }
+
+	__onBtnClick(){
+		console.log(this.$http);
+		console.log(this.initData);
+	}
+
+	// static init(){
+	// 	let directive = {};
+	// 	directive.restrict = "E";
+	// 	directive.scope = {
+	// 		initData: '@'
+	// 	}
+	// 	directive.template = '<div><button ng-click="btnClick()">Test</button></div>';
+	// 	directive.replace = true;
+	// 	return directive;
+	// }
+
+	static create(...opts){
+		// below is property/methods that match directive needs in angular 1.4.5
+		// drop the unnecessary properties/mehtods then return to angular 
+		let directiveProperties = ["priority", "template", "templateUrl", 
+		"transclude", "replace",
+		"restrict", "templateNamespace", "scope", "controller", "controllerAs",
+		"bindToController", "require", "multiElement", "compile", "link"];
+
+		let clazz = this;
+		let createFunction = function(...injects){
+			let _args = [injects].concat(opts);
+			let _directive = new clazz(..._args);
+			for(var pro in _directive) {
+				console.log(pro);
+				if(directiveProperties.indexOf(pro) < 0) {
+					delete _directive[pro];
+				}
+			}
+			_directive.compile = function(...args){				
+				let self = new clazz(..._args);
+
+				if (typeof self.link == "function") {
+					return self.link.bind(self);
+				} else if(typeof this.link == "object") {
+					if(this.link.pre && typeof this.link.pre == "function") {
+						self.link.pre.bind(self)
+					}
+					if(this.link.post && typeof this.link.post == "function") {
+						self.link.post.bind(self);
+					}
+					return self.link;
+				} else if(typeof self.compile == "function") {
+					let compiled = self.compile.apply(self, args);
+					if(compiled.pre)
+						compiled.pre = compiled.pre.bind(self);
+					if(compiled.post)
+						compiled.post = compiled.post.bind(self);
+					if(typeof compiled == "function")
+						compiled = compiled.bind(self);
+					return compiled;
+				} else {
+					console.log("no link function or error in ["+ this.constructor.name +"] directive link.");
+				}				
+			}
+			return _directive;
+		};
+		createFunction.$inject = this.ngInject;
+		return createFunction;		
+	}
+}
+TestDirective.inject(['$http']);
+
+angular.module('docsTimeDirective').directive('queryTree', TestDirective.create("red"));
+
+// angular.module('docsTimeDirective').directive('queryTree', function(){
+	
+// 	// console.log("directive");
+// 	// return new queryTree();
+// 	// class A {}
+// 	//let lnk = _queryTreeObj.link;
+// 	let _directive = new TestDirective();
+// 	_directive.link = function(scope, element){
+// 		let a = new TestDirective();
+// 		return a.link( scope, element);
+// 	}
+// 	return _directive;
+// });
+
+</script>
+</body>
+</html>
+
+

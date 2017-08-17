@@ -1,6 +1,12 @@
 
 class BaseNgClass {
-	constructor(...injects) {
+	constructor(...injectAry) {
+		let injects;
+		if(injectAry[0] && injectAry[0].constructor === Array) {
+			injects = injectAry[0];
+		} else {
+			injects = injectAry;
+		}
 		if(injects && injects.length) {
 			injects.forEach((inject, i) => this[this.constructor.ngInject[i]] = inject);
 		}
